@@ -19,6 +19,10 @@ function validarNombre(nombre){
 		return "El nombre debe tener menos de 50 caracteres.";
 	}
 
+	if (!/^[a-z]+$/i.test(nombre)){
+		return "El campo nombre solo acepta letras."
+	}
+
 	return "";
 }
 
@@ -45,5 +49,120 @@ function validarRegalo (regalo){
 	if (regalo.length > 250){
 		return "Este campo no puede superar los 250 caracteres.";
 	}
+
+	if (!/^[a-z0-9]+$/i.test(regalo)){
+		return "El campo descripcion solo puede tener numeros y letras."
+	}
+
 	return "";
 }
+
+function validarFormulario(event){
+	const $form = document.querySelector("#carta-a-santa");
+
+	const nombre = $form.nombre.value;
+	const ciudad = $form.ciudad.value;
+	const descripcion = $form["descripcion-regalo"].value;
+
+	const errorNombre = validarNombre(nombre);
+	const errorCiudad = validarCiudad(ciudad);
+	const errorDescripcion = validarRegalo(descripcion);
+
+	const errores = {
+		nombre: errorNombre,
+		ciudad: errorCiudad,
+		"descripcion-regalo": errorDescripcion
+	};
+
+	console.log(errores);
+
+	const esExito = manejarErrores(errores) === 0;
+
+	if (esExito){
+		$form.className = "oculto";
+		document.querySelector("#exito").className = "";
+		setTimeout("location.href='wishlist.html'", 5000);
+	}
+
+	event.preventDefault();
+}
+
+function manejarErrores(errores){
+
+	//Object.keys obtiene las llaves del objeto "errores".
+
+	const keys = Object.keys(errores);
+
+	const $errores = document.querySelector("#errores");
+
+	let cantidadErrores = 0;
+
+	 while ($errores.firstChild) {
+        $errores.removeChild($errores.firstChild);
+    }
+
+	keys.forEach(function(key){
+
+		const error = errores[key];
+
+
+		if (error){
+			cantidadErrores++;
+
+			$form[key].className = "error"
+
+			const $error = document.createElement("li");
+			$error.className = "mensajeError";
+			$error.innerText = error;
+
+			$errores.appendChild($error);
+		} 
+
+		else {
+			$form[key].className = ""
+		}
+
+	});
+
+	console.log(cantidadErrores);
+
+	return cantidadErrores;
+	
+
+	/*
+
+	errorName = errores.nombre;
+	errorCity = errores.ciudad;
+	errorText = errores.descripcionRegalo;
+
+
+	//Si errorName no esta vacio muestra el error. Si ESTA vacio no muestra ningun error.
+
+	if (errorName){
+		$form.nombre.className = "error";
+	} else {
+		$form.nombre.className = "";
+	}
+
+	if (errorCity){
+		$form.ciudad.className = "error";
+	} else {
+		$form.ciudad.className = "";
+	}
+
+	if (errorText){
+		$form[`descripcion-regalo`].className = "error";
+	} else {
+		$form[`descripcion-regalo`].className = "";
+	}
+
+	*/
+}
+
+
+$form.onsubmit = validarFormulario;
+
+
+// El mensaje se muestre 5 segundos y nos redireccione a whilist.html
+// Limpiar los errores en cada submit
+// 
